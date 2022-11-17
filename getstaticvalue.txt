@@ -1,0 +1,88 @@
+List<String> litems = ["1","2","Third","4"];
+
+body: new ListView.builder
+  (
+    itemCount: litems.length,
+    itemBuilder: (BuildContext ctxt, int index) {
+     return new Text(litems[index]);
+    }
+  )
+
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext ctxt) {
+    return new MaterialApp(
+      home: new ListDisplay(),
+    );
+  }
+}
+class ListDisplay extends StatelessWidget {
+  @override
+  Widget build (BuildContext ctxt) {
+    return new Scaffold(
+      appBar: new AppBar(title: new Text("Dynamic Demo"),),
+      body: new ListView.builder
+  	(
+    		itemCount: litems.length,
+    		itemBuilder: (BuildContext ctxt, int index) {
+     		return new Text(litems[index]);
+    		}
+  	)
+      ),
+    );
+  }
+}
+
+#########################################################################################################################
+ final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+
+
+Future<void> submit() async {
+    String dataurl = "API";
+
+    var req = http.MultipartRequest('POST', Uri.parse(dataurl));
+    Map<String, String> headers = {"Authorization": 'Token ' + token};
+    req.headers.addAll(headers);
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    req.fields['title'] = _Title.text;
+    req.fields['type'] = dropdownvalue.toString();
+    
+
+    if (_file1 != null) {
+      
+      var fileReadStream = _file1!.readStream;
+      var filem = http.MultipartFile(
+          'file_upload', fileReadStream!, _file1!.size,
+          filename: _file1!.name);
+      req.files.add(filem);
+
+      
+    } 
+    print(req.fields);
+    print(req.files);
+ 
+    var response = await req.send();
+    
+    if (response.statusCode == 200) // OK RESPONSE
+    {
+      
+      const snackBar = SnackBar(content:Text('Request Submitted !!'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+	Navigator.pop(context);
+	Navigator.push(context,MaterialPageRoute(builder: (context) =>const ViewPage()));
+    }
+    else 
+    {
+      
+      _formkey.currentState!.reset();
+      const snackBar = SnackBar(
+          content: Text(
+              'Data Request Not Submitted. Please contact ADMIN !!'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      Navigator.pop(context);
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const ViewPage()));
+      return false;
+    }
+  }
